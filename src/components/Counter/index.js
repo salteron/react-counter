@@ -1,7 +1,14 @@
 import React from 'react';
+import axios from 'axios';
 
 export default class Counter extends React.Component {
-  state = {value: 10}
+  state = {value: 0}
+
+  componentDidMount() {
+    axios.get('/counter')
+      .then(({data}) => this.setState({value: data}))
+      .catch(() => {})
+  }
 
   handleDecrease = () => {
     this.setState(prevState => ({value: Math.max(0, prevState.value - 1)}))

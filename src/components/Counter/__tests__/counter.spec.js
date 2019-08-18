@@ -1,37 +1,66 @@
 import React from 'react';
 import { mount, shallow } from 'enzyme';
 import Counter from '../../Counter'
+import axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
 
 describe('Counter', () => {
-  it('should init with the default value of 10', () => {
-    const wrap = shallow(<Counter/>);
+  const mockedAxios = new MockAdapter(axios);
+  const flushPromises = () => new Promise(resolve => setTimeout(resolve))
 
-    expect(wrap.find('#counter').html()).toContain('10');
+  afterEach(() => {
+    mockedAxios.reset()
   });
 
-  it('should decrement value on decrement button click', () => {
+  const decrementBtnFor = wrap => wrap.find('#decrement');
+  const incrementBtnFor = wrap => wrap.find('#increment');
+  const counterFor = wrap => wrap.find('#counter');
+
+  it('should init with a value from API', async () => {
+    mockedAxios.onGet('/counter').reply(200, 10);
+
     const wrap = mount(<Counter/>);
+    await flushPromises();
 
-    wrap.find('#decrement').simulate('click');
-
-    expect(wrap.html()).toContain('9');
+    expect(counterFor(wrap).text()).toEqual('10');
   });
 
-  it('should increment value on increment button click', () => {
+  it('should init with the default value if API call fails', async () => {
+    mockedAxios.onGet('/counter').reply(500);
+
     const wrap = mount(<Counter/>);
+    await flushPromises();
 
-    wrap.find('#increment').simulate('click');
-
-    expect(wrap.html()).toContain('11');
+    expect(counterFor(wrap).text()).toEqual('0');
   });
 
-  it('should not decrement below zero', () => {
+  it('should decrement value on decrement button click', async () => {
+    mockedAxios.onGet('/counter').reply(200, 10);
+
     const wrap = mount(<Counter/>);
+    await flushPromises();
+    decrementBtnFor(wrap).simulate('click');
 
-    for (let i = 0; i <= 10; i++) {
-      wrap.find('#decrement').simulate('click');
-    }
+    expect(counterFor(wrap).text()).toEqual('9');
+  });
 
-    expect(wrap.html()).toContain('0');
+  it('should increment value on increment button click', async () => {
+    mockedAxios.onGet('/counter').reply(200, 10);
+
+    const wrap = mount(<Counter/>);
+    await flushPromises();
+    incrementBtnFor(wrap).simulate('click');
+
+    expect(counterFor(wrap).text()).toEqual('11');
+  });
+
+  it('should not decrement below zero', async () => {
+    mockedAxios.onGet('/counter').reply(200, 0);
+
+    const wrap = mount(<Counter/>);
+    await flushPromises()
+    decrementBtnFor(wrap).simulate('click');
+
+    expect(counterFor(wrap).text()).toEqual('0');
   });
 });
