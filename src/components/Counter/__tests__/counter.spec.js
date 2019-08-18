@@ -14,6 +14,7 @@ describe('Counter', () => {
 
   const decrementBtnFor = wrap => wrap.find('#decrement');
   const incrementBtnFor = wrap => wrap.find('#increment');
+  const randomBtnFor = wrap => wrap.find('#random');
   const counterFor = wrap => wrap.find('#counter');
 
   it('should init with a value from API', async () => {
@@ -62,5 +63,17 @@ describe('Counter', () => {
     decrementBtnFor(wrap).simulate('click');
 
     expect(counterFor(wrap).text()).toEqual('0');
+  });
+
+  it('should randomize value on random button click', async () => {
+    mockedAxios.onGet('/counter').reply(200, 0);
+
+    const random = jest.fn(() => 42);
+
+    const wrap = mount(<Counter random={random}/>);
+    await flushPromises()
+    randomBtnFor(wrap).simulate('click');
+
+    expect(counterFor(wrap).text()).toEqual('42');
   });
 });
