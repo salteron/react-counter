@@ -1,49 +1,38 @@
 import React from 'react';
-import axios from 'axios';
 import PropTypes from 'prop-types';
 
-export default class Counter extends React.Component {
-  state = {value: 0}
+export default function Counter(props) {
+  const { id, value, onIncrement, onDecrement, onRandom } = props
 
-  componentDidMount() {
-    axios.get('/counter')
-      .then(({data}) => this.setState({value: data}))
-      .catch(() => {})
-  }
+  const handleDecrement = () => onDecrement(id)
+  const handleIncrement = () => onIncrement(id)
+  const handleRandom = () => onRandom(id)
 
-  handleDecrease = () => {
-    this.setState(prevState => ({value: Math.max(0, prevState.value - 1)}))
-  }
-
-  handleIncrease = () => {
-    this.setState(prevState => ({value: prevState.value + 1}))
-  }
-
-  handleRandom = () => {
-    this.props.random && this.setState({value: this.props.random()})
-  }
-
-  render() {
-    return (
-      <div>
-        <button id="decrement" onClick={this.handleDecrease}>
-          Decrement
-        </button>
-        {' '}
-        <button id="increment" onClick={this.handleIncrease}>
-          Increment
-        </button>
-        {' '}
-        <button id="random" onClick={this.handleRandom}>
-          Random
-        </button>
-        {' '}
-        <div style={{display: 'inline-block'}} id="counter">{this.state.value}</div>
+  return (
+    <div>
+      <button id={"counter-" + id + "-decrement"} onClick={handleDecrement}>
+        Decrement
+      </button>
+      {' '}
+      <button id={"counter-" + id + "-increment"} onClick={handleIncrement}>
+        Increment
+      </button>
+      {' '}
+      <button id={"counter-" + id + "-random"} onClick={handleRandom}>
+        Randomize
+      </button>
+      {' '}
+      <div style={{display: 'inline-block'}} id={"counter-" + id + "-value"}>
+        {value}
       </div>
-    )
-  }
+    </div>
+  )
 }
 
 Counter.propTypes = {
-  random: PropTypes.func
+  id: PropTypes.number,
+  value: PropTypes.number,
+  onIncrement: PropTypes.func,
+  onDecrement: PropTypes.func,
+  onRandom: PropTypes.func,
 };

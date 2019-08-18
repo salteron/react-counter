@@ -1,10 +1,14 @@
 import React from 'react';
 import ReactDom from 'react-dom';
-import { getRandom1000 } from './utils/random'
-
-import Counter from './components/Counter'
+import Counters from './containers/Counters'
+import { Provider } from 'react-redux';
+import store from './store'
 
 ReactDom.render(
-  <Counter random={getRandom1000}/>,
+  (
+    <Provider store={store}>
+      <Counters/>
+    </Provider>
+  ),
   document.getElementById('app')
 );
